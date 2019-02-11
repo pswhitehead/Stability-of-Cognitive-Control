@@ -1,4 +1,5 @@
 # Stability-of-Cognitive-Control
+Things to think about...
 
 ## Main takeaway point:
   Engagement of cognitive control fluxtuates not just between individuals (Botella et al., 2019), 
