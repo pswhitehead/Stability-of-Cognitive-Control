@@ -7,11 +7,11 @@ Things to think about...
   bottom up task contingencies.
 
 ## Data used:
-  *data from Whitehead, Brewer, Blais, 2018 (JEP:LMC)
-  *data collected by Blais (2018)
+  * data from Whitehead, Brewer, Blais, 2018 (JEP:LMC)
+  * data collected by Blais (2018)
   
 ## Ideas for modeling cognitive control engagement over time:
-  *use/adapt method from Botella et al., (2019; Acta Psychologica)?
-  *develop linear mixed model?
-    *would need to use STAN because of size of data
-    *frequentist vs. bayesian?
+  * use/adapt method from Botella et al., (2019; Acta Psychologica)?
+  * develop linear mixed model?
+    * would need to use STAN because of size of data
+    * frequentist vs. bayesian?
