@@ -15,12 +15,13 @@ library(ggthemes)
 library(ggplot2)
 library(readr)
 library(ggalluvial)
+library(data.table)
 ```
 
 ##Load in data
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
 #Loading in the seperate raw datafiles
-data.raw<- read_csv("Experiment1.csv")
+data.raw<- fread("Data/Experiment1.csv")
 ```
 
 ##Clean the data
@@ -40,8 +41,6 @@ includesubs <- c(507,508,513,514,517,518,519,520,521,506,515,523,524,525,526,527
                  668,669,670,671,672,673,674,675,676,680,678,679,681,683,685,687,689,690,692,693,
                  694,696,697,698,699,700,701,702,704,705,706,708,710,711,712,713,715,716,718,719,
                  720,721,723,724,725,726,728,729,730,732,733,734,736,737,738,739,740,741)
-
-data$StimSlideSimon.RT <- as.numeric(as.character(data$StimSlideSimon.RT))
 
 #Filter and clean data
 df.simon <- data %>% mutate(prevcon = lag(Congruency)) %>% #creat previous congruency
@@ -238,9 +237,9 @@ flanker.1 <- id.model.test %>% group_by(Subject) %>%
 ##Load in data
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
 #Loading in the seperate raw datafiles
-data.raw.simon<- read_csv("SimonExp2.csv")
-data.raw.stroop<- read_csv("StroopExp2.csv")
-data.raw.flanker<- read_csv("FlankerExp2.csv")
+data.raw.simon<- read_csv("Data/SimonExp2.csv")
+data.raw.stroop<- read_csv("Data/StroopExp2.csv")
+data.raw.flanker<- read_csv("Data/FlankerExp2.csv")
 ```
 
 ##Clean the data
@@ -496,9 +495,9 @@ flanker.2 <- id.model.test %>% group_by(Subject) %>%
 ##Load in data
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
 #Loading in the seperate raw datafiles
-data.raw.simon<- read_csv("SimonExp3.csv")
-data.raw.stroop<- read_csv("StroopExp3.csv")
-data.raw.flanker<- read_csv("FlankerExp3.csv")
+data.raw.simon<- read_csv("Data/SimonExp3.csv")
+data.raw.stroop<- read_csv("Data/StroopExp3.csv")
+data.raw.flanker<- read_csv("Data/FlankerExp3.csv")
 ```
 
 ##Clean the data
@@ -653,7 +652,7 @@ flanker.3 <- id.model.test %>% group_by(Subject) %>%
 
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
 #Loading in the seperate raw datafiles
-data.raw<- read_csv("Experiment4_FO.csv")
+data.raw<- read_csv("Data/Experiment4_FO.csv")
 
 #Filter and clean data
 #Same as previous
@@ -881,6 +880,7 @@ flanker.4 <- id.model.test %>% group_by(Subject) %>%
   summarize(totalswitch = sum(switchprop)/length(unique(id.model.test$Block)))
 ```
 
+# Overall Switching Rate for each Experiment
 ```{r}
 plot.switch <- as.data.frame(cbind(rep(1:3,each=4),rep(1:4,3),
                      rbind(simon.1,simon.2,simon.3,simon.4,
@@ -902,26 +902,4 @@ ggplot(plot.switch, aes(x = factor(Experiment), y = Percent, group = factor(Task
     theme_classic(base_size = 12) +
     #theme(legend.position = c(.75, .9)) +
     NULL
-```
-
-
-## Testing Mixed Models Correlations
-```{r}
-model.simon <- lmer(RT ~ prevcon*Congruency + (1+prevcon*Congruency|Subject), data = df.simon)
-model.stroop <- lmer(RT ~ prevcon*Congruency + (1+prevcon*Congruency|Subject), data = df.stroop)
-model.flanker <- lmer(RT ~ prevcon*Congruency + (1+prevcon*Congruency|Subject), data = df.flanker)
-
-cor.test(ranef(model.simon)$Subject[,4],ranef(model.stroop)$Subject[,4], method = c("spearman"))
-cor.test(ranef(model.stroop)$Subject[,4],ranef(model.flanker)$Subject[,4], method = c("spearman"))
-cor.test(ranef(model.flanker)$Subject[,4],ranef(model.simon)$Subject[,4], method = c("spearman"))
-
-```
-
-```{r}
-plot(coef(model.flanker)$Subject[,4],coef(model.simon)$Subject[,4])
-
-plot(coef(model.flanker)$Subject[,4],coef(model.stroop)$Subject[,4])
-
-plot(coef(model.stroop)$Subject[,4],coef(model.simon)$Subject[,4])
-
 ```
