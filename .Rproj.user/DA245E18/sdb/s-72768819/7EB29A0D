@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "---\ntitle: \"Mixed Model Analysis of Individual Effects\"\noutput: html_notebook\n---\n\n```{r}\nlibrary(lme4)\n\nmodel.lmer <- lme4::lmer(scale(RT) ~ prevcon*Congruency + (1+prevcon*Congruency|Subject), data = df.simon)\n\nsummary(model.lmer)\n\nrr1 <- ranef(model.lmer, postVar = T)$Subject\n```\n\n```{r}\nconf.re <- function(.) {\n  ranef(., condVar = T)$Subject[['prevcon:Congruency']]\n}\n\nconf.int2 <- (bootMer(model.lmer, FUN = conf.re,\n       re.form=~prevcon*Congruency|Subject,\n       nsim = 1000, type = \"parametric\", parallel = \"snow\", ncpus =3,.progress = \"win\"))\n\n```\n\n```{r}\nlibrary(boot)\nlibrary(dplyr)\nlibrary(ggplot2)\n\ngetCI <- function(x,w) {\n   b1 <- boot.ci(x,type = c(\"norm\"),index=w)\n   ## combine with metadata: CI method, index\n   tab <- cbind(w,b1$t0,b1$normal[2],b1$normal[3])\n   colnames(tab) <- c(\"index\",\"point\",\"lwr\",\"upr\")\n   tab\n}\n\n## do it for both parameters\nplot.CI <- as.data.frame(do.call(rbind,lapply(1:178,getCI,x=conf.int2)))\n\nplot.CI <- plot.CI %>% arrange(point) %>% mutate(order = rep(1:178), bestmodel = factor(ifelse((upr < 0 | lwr > 0),1,0)))\n\nggplot(plot.CI, \n       aes(x = order, y = point, color = bestmodel)) +\n  geom_point() +\n  geom_errorbar(aes(ymin=lwr, ymax=upr), width=.2) +\n  scale_color_brewer(palette = \"Set1\") +\n  xlab(\"Subject\") + ylab(\"Random Effect Estimate for PrevCon*Con Interaction\") +\n  geom_hline(yintercept=0) +\n  theme_classic()\n\n```\n\n",
+    "created" : 1550086789556.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2213400717",
+    "id" : "7EB29A0D",
+    "lastKnownWriteTime" : 1550086842,
+    "last_content_update" : 1550086843008,
+    "path" : "~/GitHub/Stability-of-Cognitive-Control/mixed model analysis.Rmd",
+    "project_path" : "mixed model analysis.Rmd",
+    "properties" : {
+        "chunk_output_type" : "inline",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 8,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

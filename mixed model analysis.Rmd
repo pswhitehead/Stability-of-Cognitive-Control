@@ -1,0 +1,55 @@
+---
+title: "Mixed Model Analysis of Individual Effects"
+output: html_notebook
+---
+
+```{r}
+library(lme4)
+
+model.lmer <- lme4::lmer(scale(RT) ~ prevcon*Congruency + (1+prevcon*Congruency|Subject), data = df.simon)
+
+summary(model.lmer)
+
+rr1 <- ranef(model.lmer, postVar = T)$Subject
+```
+
+```{r}
+conf.re <- function(.) {
+  ranef(., condVar = T)$Subject[['prevcon:Congruency']]
+}
+
+conf.int2 <- (bootMer(model.lmer, FUN = conf.re,
+       re.form=~prevcon*Congruency|Subject,
+       nsim = 1000, type = "parametric", parallel = "snow", ncpus =3,.progress = "win"))
+
+```
+
+```{r}
+library(boot)
+library(dplyr)
+library(ggplot2)
+
+getCI <- function(x,w) {
+   b1 <- boot.ci(x,type = c("norm"),index=w)
+   ## combine with metadata: CI method, index
+   tab <- cbind(w,b1$t0,b1$normal[2],b1$normal[3])
+   colnames(tab) <- c("index","point","lwr","upr")
+   tab
+}
+
+## do it for both parameters
+plot.CI <- as.data.frame(do.call(rbind,lapply(1:178,getCI,x=conf.int2)))
+
+plot.CI <- plot.CI %>% arrange(point) %>% mutate(order = rep(1:178), bestmodel = factor(ifelse((upr < 0 | lwr > 0),1,0)))
+
+ggplot(plot.CI, 
+       aes(x = order, y = point, color = bestmodel)) +
+  geom_point() +
+  geom_errorbar(aes(ymin=lwr, ymax=upr), width=.2) +
+  scale_color_brewer(palette = "Set1") +
+  xlab("Subject") + ylab("Random Effect Estimate for PrevCon*Con Interaction") +
+  geom_hline(yintercept=0) +
+  theme_classic()
+
+```
+
