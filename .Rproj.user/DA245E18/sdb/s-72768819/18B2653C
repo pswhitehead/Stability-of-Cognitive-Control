@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "# Stability-of-Cognitive-Control\nThings to think about...\n\n## Main takeaway point:\n  Engagement of cognitive control fluxtuates not just between individuals (Botella et al., 2019), \n  but also over the course of a task. The variability in control engagement can be reduced by \n  bottom up task contingencies.\n\n## Data used:\n  * data from Whitehead, Brewer, Blais, 2018 (JEP:LMC)\n  * data collected by Blais (2018)\n  \n## Ideas for modeling cognitive control engagement over time:\n  * use/adapt method from Botella et al., (2019; Acta Psychologica)?\n  * develop linear mixed model?\n    * would need to use STAN because of size of data\n    * frequentist vs. bayesian?",
+    "created" : 1549903784709.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3925304173",
+    "id" : "18B2653C",
+    "lastKnownWriteTime" : 1549908158,
+    "last_content_update" : 1549908158959,
+    "path" : "~/GitHub/Stability-of-Cognitive-Control/README.md",
+    "project_path" : "README.md",
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "markdown"
+}
