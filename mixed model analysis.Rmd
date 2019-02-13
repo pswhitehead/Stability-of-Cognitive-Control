@@ -23,12 +23,47 @@ model.flanker <- lme4::lmer(scale(RT) ~ prevcon*Congruency + (1+prevcon*Congruen
 ```
 
 ```{r}
-conf <- function(.){ranef(., condVar = T)$Subject[["Congruency"]]}
+conf.congruency <- function(.){ranef(., condVar = T)$Subject[["Congruency"]]}
 
-simon.congruency <- (bootMer(model.simon, FUN = conf,
+simon.congruency <- (bootMer(model.simon, FUN = conf.congruency,
        re.form=~prevcon*Congruency|Subject, 
        nsim = 10, type = "parametric", parallel = "snow", ncpus = 3))
 
+flanker.congruency <- (bootMer(model.flanker, FUN = conf.congruency,
+       re.form=~prevcon*Congruency|Subject, 
+       nsim = 10, type = "parametric", parallel = "snow", ncpus = 3))
+
+stroop.congruency <- (bootMer(model.stroop, FUN = conf.congruency,
+       re.form=~prevcon*Congruency|Subject, 
+       nsim = 10, type = "parametric", parallel = "snow", ncpus = 3))
+
+conf.prevcon <- function(.){ranef(., condVar = T)$Subject[["prevcon"]]}
+
+simon.prevcon <- (bootMer(model.simon, FUN = conf.prevcon,
+       re.form=~prevcon*Congruency|Subject, 
+       nsim = 10, type = "parametric", parallel = "snow", ncpus = 3))
+
+flanker.prevcon <- (bootMer(model.flanker, FUN = conf.prevcon,
+       re.form=~prevcon*Congruency|Subject, 
+       nsim = 10, type = "parametric", parallel = "snow", ncpus = 3))
+
+stroop.prevcon <- (bootMer(model.stroop, FUN = conf.prevcon,
+       re.form=~prevcon*Congruency|Subject, 
+       nsim = 10, type = "parametric", parallel = "snow", ncpus = 3))
+
+conf.int <- function(.){ranef(., condVar = T)$Subject[["prevcon:Congruency"]]}
+
+simon.int <- (bootMer(model.simon, FUN = conf.int,
+       re.form=~prevcon*Congruency|Subject, 
+       nsim = 10, type = "parametric", parallel = "snow", ncpus = 3))
+
+flanker.int <- (bootMer(model.flanker, FUN = conf.int,
+       re.form=~prevcon*Congruency|Subject, 
+       nsim = 10, type = "parametric", parallel = "snow", ncpus = 3))
+
+stroop.int <- (bootMer(model.stroop, FUN = conf.int,
+       re.form=~prevcon*Congruency|Subject, 
+       nsim = 10, type = "parametric", parallel = "snow", ncpus = 3))
 ```
 
 ```{r}
@@ -48,14 +83,112 @@ getCI <- function(x,w) {
 plot.CI.simon.congruency <- as.data.frame(do.call(rbind,lapply(1:178,getCI,x=simon.congruency))) %>% 
   arrange(point) %>% mutate(order = rep(1:178), bestmodel = factor(ifelse((upr < 0 | lwr > 0),1,0)))
 
+plot.CI.flanker.congruency <- as.data.frame(do.call(rbind,lapply(1:178,getCI,x=flanker.congruency))) %>% 
+  arrange(point) %>% mutate(order = rep(1:178), bestmodel = factor(ifelse((upr < 0 | lwr > 0),1,0)))
+
+plot.CI.stroop.congruency <- as.data.frame(do.call(rbind,lapply(1:178,getCI,x=stroop.congruency))) %>% 
+  arrange(point) %>% mutate(order = rep(1:178), bestmodel = factor(ifelse((upr < 0 | lwr > 0),1,0)))
+
+plot.CI.simon.prevcon <- as.data.frame(do.call(rbind,lapply(1:178,getCI,x=simon.prevcon))) %>% 
+  arrange(point) %>% mutate(order = rep(1:178), bestmodel = factor(ifelse((upr < 0 | lwr > 0),1,0)))
+
+plot.CI.flanker.prevcon <- as.data.frame(do.call(rbind,lapply(1:178,getCI,x=flanker.prevcon))) %>% 
+  arrange(point) %>% mutate(order = rep(1:178), bestmodel = factor(ifelse((upr < 0 | lwr > 0),1,0)))
+
+plot.CI.stroop.prevcon <- as.data.frame(do.call(rbind,lapply(1:178,getCI,x=stroop.prevcon))) %>% 
+  arrange(point) %>% mutate(order = rep(1:178), bestmodel = factor(ifelse((upr < 0 | lwr > 0),1,0)))
+
+plot.CI.simon.int <- as.data.frame(do.call(rbind,lapply(1:178,getCI,x=simon.int))) %>% 
+  arrange(point) %>% mutate(order = rep(1:178), bestmodel = factor(ifelse((upr < 0 | lwr > 0),1,0)))
+
+plot.CI.flanker.int <- as.data.frame(do.call(rbind,lapply(1:178,getCI,x=flanker.int))) %>% 
+  arrange(point) %>% mutate(order = rep(1:178), bestmodel = factor(ifelse((upr < 0 | lwr > 0),1,0)))
+
+plot.CI.stroop.int <- as.data.frame(do.call(rbind,lapply(1:178,getCI,x=stroop.int))) %>% 
+  arrange(point) %>% mutate(order = rep(1:178), bestmodel = factor(ifelse((upr < 0 | lwr > 0),1,0)))
+```
+
+```{r}
+#plot stuff
 ggplot(plot.CI.simon.congruency, 
        aes(x = order, y = point, color = bestmodel)) +
   geom_point() +
   geom_errorbar(aes(ymin=lwr, ymax=upr), width=.2) +
   scale_color_brewer(palette = "Set1") +
-  xlab("Subject") + ylab("Random Effect Estimate for Congruency") +
+  xlab("Subject") + ylab("Simon Random Effect Estimate for Congruency") +
   geom_hline(yintercept=0) +
   theme_classic()
 
+ggplot(plot.CI.flanker.congruency, 
+       aes(x = order, y = point, color = bestmodel)) +
+  geom_point() +
+  geom_errorbar(aes(ymin=lwr, ymax=upr), width=.2) +
+  scale_color_brewer(palette = "Set1") +
+  xlab("Subject") + ylab("Flanker Random Effect Estimate for Congruency") +
+  geom_hline(yintercept=0) +
+  theme_classic()
+
+ggplot(plot.CI.stroop.congruency, 
+       aes(x = order, y = point, color = bestmodel)) +
+  geom_point() +
+  geom_errorbar(aes(ymin=lwr, ymax=upr), width=.2) +
+  scale_color_brewer(palette = "Set1") +
+  xlab("Subject") + ylab("Stroop Random Effect Estimate for Congruency") +
+  geom_hline(yintercept=0) +
+  theme_classic()
+
+ggplot(plot.CI.simon.prevcon, 
+       aes(x = order, y = point, color = bestmodel)) +
+  geom_point() +
+  geom_errorbar(aes(ymin=lwr, ymax=upr), width=.2) +
+  scale_color_brewer(palette = "Set1") +
+  xlab("Subject") + ylab("Simon Random Effect Estimate for PrevCon") +
+  geom_hline(yintercept=0) +
+  theme_classic()
+
+ggplot(plot.CI.flanker.prevcon, 
+       aes(x = order, y = point, color = bestmodel)) +
+  geom_point() +
+  geom_errorbar(aes(ymin=lwr, ymax=upr), width=.2) +
+  scale_color_brewer(palette = "Set1") +
+  xlab("Subject") + ylab("Flanker Random Effect Estimate for PrevCon") +
+  geom_hline(yintercept=0) +
+  theme_classic()
+
+ggplot(plot.CI.stroop.prevcon, 
+       aes(x = order, y = point, color = bestmodel)) +
+  geom_point() +
+  geom_errorbar(aes(ymin=lwr, ymax=upr), width=.2) +
+  scale_color_brewer(palette = "Set1") +
+  xlab("Subject") + ylab("Stroop Random Effect Estimate for PrevCon") +
+  geom_hline(yintercept=0) +
+  theme_classic()
+
+ggplot(plot.CI.simon.int, 
+       aes(x = order, y = point, color = bestmodel)) +
+  geom_point() +
+  geom_errorbar(aes(ymin=lwr, ymax=upr), width=.2) +
+  scale_color_brewer(palette = "Set1") +
+  xlab("Subject") + ylab("Simon Random Effect Estimate for Interaction") +
+  geom_hline(yintercept=0) +
+  theme_classic()
+
+ggplot(plot.CI.flanker.int, 
+       aes(x = order, y = point, color = bestmodel)) +
+  geom_point() +
+  geom_errorbar(aes(ymin=lwr, ymax=upr), width=.2) +
+  scale_color_brewer(palette = "Set1") +
+  xlab("Subject") + ylab("Flanker Random Effect Estimate for Interaction") +
+  geom_hline(yintercept=0) +
+  theme_classic()
+
+ggplot(plot.CI.stroop.int, 
+       aes(x = order, y = point, color = bestmodel)) +
+  geom_point() +
+  geom_errorbar(aes(ymin=lwr, ymax=upr), width=.2) +
+  scale_color_brewer(palette = "Set1") +
+  xlab("Subject") + ylab("Stroop Random Effect Estimate for Interaction") +
+  geom_hline(yintercept=0) +
+  theme_classic()
 ```
 
