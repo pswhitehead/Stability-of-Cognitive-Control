@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1550089030000.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "241102740",
+    "id" : "B8DE9EE7",
+    "lastKnownWriteTime" : 1550095499,
+    "last_content_update" : 1550095499627,
+    "path" : "~/GitHub/Stability-of-Cognitive-Control/mixed model analysis.Rmd",
+    "project_path" : "mixed model analysis.Rmd",
+    "properties" : {
+        "chunk_output_type" : "inline",
+        "cursorPosition" : "55,63",
+        "scrollLine" : "38"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

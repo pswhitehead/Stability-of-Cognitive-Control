@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1550089042801.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "3EE430EE",
+    "lastKnownWriteTime" : 1550088471,
+    "last_content_update" : 1550088471,
+    "path" : "~/GitHub/Stability-of-Cognitive-Control/stability analysis.Rmd",
+    "project_path" : "stability analysis.Rmd",
+    "properties" : {
+        "cursorPosition" : "34,33",
+        "scrollLine" : "19"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

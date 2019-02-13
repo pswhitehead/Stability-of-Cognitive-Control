@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1550089196434.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3081863664",
+    "id" : "1B377841",
+    "lastKnownWriteTime" : 1550090133,
+    "last_content_update" : 1550090133757,
+    "path" : "~/GitHub/Stability-of-Cognitive-Control/lib.R",
+    "project_path" : "lib.R",
+    "properties" : {
+        "cursorPosition" : "100,8",
+        "scrollLine" : "42",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
