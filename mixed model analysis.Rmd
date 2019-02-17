@@ -3,7 +3,7 @@ title: "Mixed Model Analysis of Individual Effects"
 output: html_notebook
 ---
 
-```{r}
+```{r, message=FALSE, warning=FALSE, include=FALSE}
 source('lib.R')
 data.raw <- load.data.exp1()
 df.simon <- clean.simon()
@@ -22,90 +22,33 @@ model.flanker <- lme4::lmer(scale(RT) ~ prevcon*Congruency + (1+prevcon*Congruen
 
 ```
 
+##Get point estimates and 'prediction intervals' for each random effect in model
 ```{r}
-conf.congruency <- function(.){ranef(., condVar = T)$Subject[["Congruency"]]}
-
-simon.congruency <- (bootMer(model.simon, FUN = conf.congruency,
-       re.form=~prevcon*Congruency|Subject, 
-       nsim = 10, type = "parametric", parallel = "snow", ncpus = 3))
-
-flanker.congruency <- (bootMer(model.flanker, FUN = conf.congruency,
-       re.form=~prevcon*Congruency|Subject, 
-       nsim = 10, type = "parametric", parallel = "snow", ncpus = 3))
-
-stroop.congruency <- (bootMer(model.stroop, FUN = conf.congruency,
-       re.form=~prevcon*Congruency|Subject, 
-       nsim = 10, type = "parametric", parallel = "snow", ncpus = 3))
-
-conf.prevcon <- function(.){ranef(., condVar = T)$Subject[["prevcon"]]}
-
-simon.prevcon <- (bootMer(model.simon, FUN = conf.prevcon,
-       re.form=~prevcon*Congruency|Subject, 
-       nsim = 10, type = "parametric", parallel = "snow", ncpus = 3))
-
-flanker.prevcon <- (bootMer(model.flanker, FUN = conf.prevcon,
-       re.form=~prevcon*Congruency|Subject, 
-       nsim = 10, type = "parametric", parallel = "snow", ncpus = 3))
-
-stroop.prevcon <- (bootMer(model.stroop, FUN = conf.prevcon,
-       re.form=~prevcon*Congruency|Subject, 
-       nsim = 10, type = "parametric", parallel = "snow", ncpus = 3))
-
-conf.int <- function(.){ranef(., condVar = T)$Subject[["prevcon:Congruency"]]}
-
-simon.int <- (bootMer(model.simon, FUN = conf.int,
-       re.form=~prevcon*Congruency|Subject, 
-       nsim = 10, type = "parametric", parallel = "snow", ncpus = 3))
-
-flanker.int <- (bootMer(model.flanker, FUN = conf.int,
-       re.form=~prevcon*Congruency|Subject, 
-       nsim = 10, type = "parametric", parallel = "snow", ncpus = 3))
-
-stroop.int <- (bootMer(model.stroop, FUN = conf.int,
-       re.form=~prevcon*Congruency|Subject, 
-       nsim = 10, type = "parametric", parallel = "snow", ncpus = 3))
-```
-
-```{r}
-library(boot)
-library(dplyr)
-library(ggplot2)
-
-getCI <- function(x,w) {
-   b1 <- boot.ci(x,type = c("norm"),index=w)
-   ## combine with metadata: CI method, index
-   tab <- cbind(w,b1$t0,b1$normal[2],b1$normal[3])
-   colnames(tab) <- c("index","point","lwr","upr")
-   tab
+Randomeffect.CIs <- function(model, factor){
+  conf.congruency <- 
+    cbind(ranef(model, condVar = T)$Subject[[factor]],
+    ranef(model, condVar = T)$Subject[[factor]]+
+      (-1*qnorm(.975)*sqrt(attr(ranef(model, condVar = TRUE)[[1]], "postVar")
+                           [factor,factor,])),
+    ranef(model, condVar = T)$Subject[[factor]]+
+      (1*qnorm(.975)*sqrt(attr(ranef(model, condVar = TRUE)[[1]], "postVar")
+                          [factor,factor,])))
+                           
 }
 
-## do it for both parameters
-plot.CI.simon.congruency <- as.data.frame(do.call(rbind,lapply(1:178,getCI,x=simon.congruency))) %>% 
-  arrange(point) %>% mutate(order = rep(1:178), bestmodel = factor(ifelse((upr < 0 | lwr > 0),1,0)))
+simon.congruency <- as.data.frame(Randomeffect.CIs(model.simon, 2)) %>% 
+  arrange(V1) %>% mutate(order = rep(1:178), bestmodel = (ifelse((V3 < 0 | V2 > 0),1,0)))
 
-plot.CI.flanker.congruency <- as.data.frame(do.call(rbind,lapply(1:178,getCI,x=flanker.congruency))) %>% 
-  arrange(point) %>% mutate(order = rep(1:178), bestmodel = factor(ifelse((upr < 0 | lwr > 0),1,0)))
+library(ggplot2)
+ggplot(simon.congruency, 
+       aes(x = order, y = V1, color = factor(bestmodel))) +
+  geom_point() +
+  geom_errorbar(aes(ymin=V2, ymax=V3), width=.2) +
+  scale_color_brewer(palette = "Set1") +
+  xlab("Subject") + ylab("Simon Random Effect Estimate for Congruency") +
+  geom_hline(yintercept=0) +
+  theme_classic()
 
-plot.CI.stroop.congruency <- as.data.frame(do.call(rbind,lapply(1:178,getCI,x=stroop.congruency))) %>% 
-  arrange(point) %>% mutate(order = rep(1:178), bestmodel = factor(ifelse((upr < 0 | lwr > 0),1,0)))
-
-plot.CI.simon.prevcon <- as.data.frame(do.call(rbind,lapply(1:178,getCI,x=simon.prevcon))) %>% 
-  arrange(point) %>% mutate(order = rep(1:178), bestmodel = factor(ifelse((upr < 0 | lwr > 0),1,0)))
-
-plot.CI.flanker.prevcon <- as.data.frame(do.call(rbind,lapply(1:178,getCI,x=flanker.prevcon))) %>% 
-  arrange(point) %>% mutate(order = rep(1:178), bestmodel = factor(ifelse((upr < 0 | lwr > 0),1,0)))
-
-plot.CI.stroop.prevcon <- as.data.frame(do.call(rbind,lapply(1:178,getCI,x=stroop.prevcon))) %>% 
-  arrange(point) %>% mutate(order = rep(1:178), bestmodel = factor(ifelse((upr < 0 | lwr > 0),1,0)))
-
-plot.CI.simon.int <- as.data.frame(do.call(rbind,lapply(1:178,getCI,x=simon.int))) %>% 
-  arrange(point) %>% mutate(order = rep(1:178), bestmodel = factor(ifelse((upr < 0 | lwr > 0),1,0)))
-
-plot.CI.flanker.int <- as.data.frame(do.call(rbind,lapply(1:178,getCI,x=flanker.int))) %>% 
-  arrange(point) %>% mutate(order = rep(1:178), bestmodel = factor(ifelse((upr < 0 | lwr > 0),1,0)))
-
-plot.CI.stroop.int <- as.data.frame(do.call(rbind,lapply(1:178,getCI,x=stroop.int))) %>% 
-  arrange(point) %>% mutate(order = rep(1:178), bestmodel = factor(ifelse((upr < 0 | lwr > 0),1,0)))
 ```
 
 ```{r}

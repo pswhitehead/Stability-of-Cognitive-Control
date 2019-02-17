@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1550431461573.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "D570A3DC",
+    "lastKnownWriteTime" : 5292976843906638626,
+    "last_content_update" : 1550431461573,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "5F01BDDF",
+        "caption" : "simon.congruency",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=simon.congruency&cache_key=5F01BDDF",
+        "displayedObservations" : 178,
+        "environment" : "",
+        "object" : "simon.congruency",
+        "preview" : 0,
+        "totalObservations" : 178,
+        "variables" : 3
+    },
+    "relative_order" : 9,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
