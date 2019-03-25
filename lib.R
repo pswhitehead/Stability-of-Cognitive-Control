@@ -11,7 +11,7 @@ load.data.exp1 <- function(){
   
   return(data.raw)
 }
-  
+
 clean.simon <- function(){
   ##Clean the data
   #Make a dataframe of only the necessary variables because these datafiles are yuuuuge
@@ -37,7 +37,8 @@ clean.simon <- function(){
     filter(Subject %in% includesubs & StimSlideSimon.RT != "" &
              (StimSlideSimon.RT > 200 & StimSlideSimon.RT < 3000) & #liberal filter
              StimSlideSimon.ACC == 1 & prevcon != 'NA' & acc == 1 & #accuracy
-             BlockNum > 2) #experimental only blocks
+             BlockNum > 2) #%>%
+    #mutate(prevcon = factor(prevcon), Congruency = factor(Congruency), Subject = factor(Subject)) #experimental only blocks
   
   return(df.simon)
 }
@@ -66,7 +67,8 @@ clean.flanker <- function() {
     filter(Subject %in% includesubs & StimSlideFlanker.RT != "" &
              (StimSlideFlanker.RT > 200 & StimSlideFlanker.RT < 3000) &
              StimSlideFlanker.ACC == 1 & prevcon != 'NA' & acc == 1 &
-             BlockNum > 2)
+             BlockNum > 2) #%>%
+    #mutate(prevcon = factor(prevcon), Congruency = factor(Congruency), Subject = factor(Subject))
   
   return(df.flanker)
 }
@@ -96,7 +98,8 @@ clean.stroop <- function(){
     filter(Subject %in% includesubs &  StimSlideStroop.RT != "" &
              (StimSlideStroop.RT > 200 & StimSlideStroop.RT < 3000) &
              StimSlideStroop.ACC == 1 & prevcon != 'NA' & acc == 1 &
-             BlockNum > 2)
+             BlockNum > 2) #%>%
+   # mutate(prevcon = factor(prevcon), Congruency = factor(Congruency), Subject = factor(Subject))
   
   return(df.stroop)
 }

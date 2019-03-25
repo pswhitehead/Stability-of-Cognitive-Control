@@ -3,6 +3,29 @@ title: "Mixed Model Analysis of Individual Effects"
 output: html_notebook
 ---
 
+Outline for paper:
+
+Introduction 
+Start with background on Botella paper, etc
+Point out argument that we can do with our data
+Potentially other ways to look at Data
+
+Section 1
+Go through and replicate their analysis on Experiment 1 (whitehead, et al., 2018) for only simon/stroop/or flanker task (pick their task)
+
+Section 2
+Go through and show how this is mathematically the same as using a random effects model to pull estimates from people
+  random effects model is like a 'type 3' estimate of values
+  botella approach was more like 'type 1' SS only accounting for things in model, not other parameters
+Show results from mixed effects models in lme (though maybe do in brms for actual confidence intervals)
+
+Section 3
+Demonstrate suing their method the variance over the course of the experiment and how that reflects the high degree of error in CIs we see in the mixed models
+
+Discussion
+Profit
+Why are things so variable? Need more thoughts.
+
 ```{r, message=FALSE, warning=FALSE, include=FALSE}
 source('lib.R')
 data.raw <- load.data.exp1()
@@ -16,9 +39,9 @@ df.stroop <- clean.stroop()
 ```{r}
 library(lme4)
 
-model.simon <- lme4::lmer(scale(RT) ~ prevcon*Congruency + (1+prevcon*Congruency|Subject), data = df.simon)
-model.stroop <- lme4::lmer(scale(RT) ~ prevcon*Congruency + (1+prevcon*Congruency|Subject), data = df.stroop)
-model.flanker <- lme4::lmer(scale(RT) ~ prevcon*Congruency + (1+prevcon*Congruency|Subject), data = df.flanker)
+model.simon <- lme4::lmer((RT) ~ prevcon*Congruency+(1+prevcon*Congruency|Subject), data = df.simon)
+model.stroop <- lme4::lmer((RT) ~ prevcon*Congruency+(1+prevcon*Congruency|Subject), data = df.stroop)
+model.flanker <- lme4::lmer((RT) ~ prevcon*Congruency+(1+prevcon*Congruency|Subject), data = df.flanker)
 
 ```
 
@@ -36,12 +59,20 @@ Randomeffect.CIs <- function(model, factor){
                            
 }
 
-simon.congruency <- as.data.frame(Randomeffect.CIs(model.simon, 2)) %>% 
-  arrange(V1) %>% mutate(order = rep(1:178), bestmodel = (ifelse((V3 < 0 | V2 > 0),1,0)))
+simon.congruency <- as.data.frame(rbind(Randomeffect.CIs(model.simon, 4))) %>%
+  #as.data.frame(rbind(Randomeffect.CIs(model.simon, 2),
+  #                                      Randomeffect.CIs(model.simon, 3),
+  #                                      Randomeffect.CIs(model.simon, 4))) %>% 
+  arrange(V1) %>% 
+  mutate(order = rep(1:178), bestmodel = (ifelse((V3 < 0 | V2 > 0),1,0)))
+  #mutate(order = rep(1:178,3), model = rep(1:3,each=178))
 
 library(ggplot2)
 ggplot(simon.congruency, 
-       aes(x = order, y = V1, color = factor(bestmodel))) +
+       aes(x = order, y = V1, 
+          #color = factor(model), group = factor(model))
+          color = factor(bestmodel))
+       ) +
   geom_point() +
   geom_errorbar(aes(ymin=V2, ymax=V3), width=.2) +
   scale_color_brewer(palette = "Set1") +
@@ -49,6 +80,29 @@ ggplot(simon.congruency,
   geom_hline(yintercept=0) +
   theme_classic()
 
+```
+
+```{r}
+simon.congruency <- #as.data.frame(rbind(Randomeffect.CIs(model.simon, 4))) %>%
+  as.data.frame(rbind(Randomeffect.CIs(model.simon, 2),
+                                        Randomeffect.CIs(model.simon, 3),
+                                        Randomeffect.CIs(model.simon, 4))) %>% 
+  #arrange(V1) %>% 
+  #mutate(order = rep(1:178), bestmodel = (ifelse((V3 < 0 | V2 > 0),1,0)))
+  mutate(order = rep(1:178,3), model = rep(1:3,each=178))
+
+library(ggplot2)
+ggplot(simon.congruency, 
+       aes(x = order, y = V1, 
+          color = factor(model), group = factor(model))
+          #color = factor(bestmodel))
+       ) +
+  geom_point() +
+  geom_errorbar(aes(ymin=V2, ymax=V3), width=.2) +
+  scale_color_brewer(palette = "Set1") +
+  xlab("Subject") + ylab("Simon Random Effect Estimate for Congruency") +
+  geom_hline(yintercept=0) +
+  theme_classic()
 ```
 
 ```{r}
